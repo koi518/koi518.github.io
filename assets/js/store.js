@@ -58,7 +58,7 @@ const DB = {
   monthDates(y, m) {
     const out = [];
     const d = new Date(y, m, 1);
-    while (d.getMonth() === m) { out.push(this.dateKey(new Date(d))); d.setDate(d.getDate() + 1); }
+    while (d.getMonth() === m) { out.push(Util.dateKey(new Date(d))); d.setDate(d.getDate() + 1); }
     return out;
   },
 };

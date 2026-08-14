@@ -1,15 +1,16 @@
 /* ===== 主程序：导航 / 主题 / 路由 ===== */
 (function () {
-  // 8 个模块的卡通占位形象（待哭宝原图替换）
+  // 8 个模块形象（Hello Kitty 主题图）
+  const IMG = 'assets/img/mascots/';
   const MODULES = [
-    { key: 'fortune', name: '每日运势', emoji: '🧧', color: '#f48fb1', render: () => window.Fortune.render(view) },
-    { key: 'todo', name: '待办清单', emoji: '✅', color: '#7fd6b5', render: () => window.Todo.render(view) },
-    { key: 'finance', name: '每日记账', emoji: '💰', color: '#e8a33d', render: () => window.Finance.render(view) },
-    { key: 'spanish', name: '西语学习', emoji: '🇪🇸', color: '#5b9bd5', render: () => window.Spanish.render(view) },
-    { key: 'english', name: '英语学习', emoji: '🎬', color: '#b07de8', render: () => window.English.render(view) },
-    { key: 'financenews', name: '金融信息', emoji: '📈', color: '#ef6b7d', render: () => window.FinanceNews.render(view) },
-    { key: 'ainews', name: 'AI 播报', emoji: '🛰️', color: '#6cc6c0', render: () => window.AINews.render(view) },
-    { key: 'health', name: '运动饮食', emoji: '🥗', color: '#9ccc65', render: () => window.Health.render(view) },
+    { key: 'fortune', name: '每日运势', img: IMG + '7.png', render: () => window.Fortune.render(view) },
+    { key: 'todo', name: '待办清单', img: IMG + '1.png', render: () => window.Todo.render(view) },
+    { key: 'finance', name: '每日记账', img: IMG + '6.png', render: () => window.Finance.render(view) },
+    { key: 'spanish', name: '西语学习', img: IMG + '4.png', render: () => window.Spanish.render(view) },
+    { key: 'english', name: '英语学习', img: IMG + '8.png', render: () => window.English.render(view) },
+    { key: 'financenews', name: '金融信息', img: IMG + '5.png', render: () => window.FinanceNews.render(view) },
+    { key: 'ainews', name: 'AI 播报', img: IMG + '2.png', render: () => window.AINews.render(view) },
+    { key: 'health', name: '运动饮食', img: IMG + '3.png', render: () => window.Health.render(view) },
   ];
 
   const view = document.getElementById('view');
@@ -22,10 +23,13 @@
     return '';
   }
 
+  function mascotHTML(m) {
+    return m.img ? `<img src="${m.img}" alt="">` : `<span>${m.emoji || '✨'}</span>`;
+  }
   function buildNav() {
     navEl.innerHTML = MODULES.map(m => `
       <button class="nav-item ${m.key === active ? 'active' : ''}" data-key="${m.key}">
-        <span class="mascot" style="background:${m.color}">${m.emoji}</span>
+        <span class="mascot">${mascotHTML(m)}</span>
         <span class="nav-label">${m.name}</span>
         ${badge(m.key) ? `<span class="nav-badge">${badge(m.key)}</span>` : ''}
       </button>`).join('');
@@ -68,7 +72,7 @@
     const h = now.getHours();
     const g = h < 6 ? '凌晨好' : h < 12 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
     document.getElementById('greet').textContent = `${g}，${SITE.name} 💕`;
-    document.getElementById('brandMascot').textContent = '🍼';
+    document.getElementById('brandMascot').innerHTML = `<img src="${IMG}9.png" alt="">`;
   }
 
   // 初始化
