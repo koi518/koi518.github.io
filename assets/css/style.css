@@ -19,8 +19,8 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0a0a0c;
-    --bg2: #2a0d18;
+    --bg: #2b0f1f;
+    --bg2: #4a1540;
     --surface: #2c2438;
     --surface2: #352b44;
     --text: #f4eef7;
@@ -44,7 +44,7 @@
   --shadow: 0 10px 30px rgba(233, 30, 99, .16);
 }
 :root[data-theme="dark"] {
-  --bg: #0a0a0c; --bg2: #2a0d18; --surface: #2c2438; --surface2: #352b44;
+  --bg: #2b0f1f; --bg2: #4a1540; --surface: #2c2438; --surface2: #352b44;
   --text: #f4eef7; --text-soft: #cdb9d8; --muted: #9a86aa; --border: #42354f;
   --primary: #ff6fa5; --primary-d: #ff5c93; --primary-soft: #3a2a40;
   --good: #5fd0a3; --bad: #ff8497; --warn: #f0b860;
@@ -252,8 +252,8 @@ input, textarea, select { font-family: inherit; font-size: 15px; }
 /* 系统暗色 */
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface: rgba(38, 26, 33, .66);
-    --surface2: rgba(58, 34, 44, .55);
+    --surface: rgba(60, 24, 48, .62);
+    --surface2: rgba(80, 30, 64, .5);
     --border: rgba(255, 120, 160, .18);
     --primary-soft: rgba(255, 92, 147, .14);
     --shadow: 0 12px 34px rgba(0, 0, 0, .55);
@@ -263,9 +263,9 @@ input, textarea, select { font-family: inherit; font-size: 15px; }
   }
   body {
     background:
-      radial-gradient(900px 520px at 12% -8%, rgba(233, 30, 99, .22), transparent 60%),
-      radial-gradient(760px 460px at 105% 8%, rgba(194, 24, 91, .18), transparent 55%),
-      linear-gradient(160deg, #0a0a0c 0%, #160a12 48%, #2a0d18 100%);
+      radial-gradient(900px 520px at 12% -8%, rgba(255, 105, 180, .28), transparent 60%),
+      radial-gradient(760px 460px at 105% 8%, rgba(199, 21, 99, .22), transparent 55%),
+      linear-gradient(160deg, #2b0f1f 0%, #3d1233 48%, #4a1540 100%);
   }
   .card, .panel, .item, .sum .pill, .input, textarea.input, select.input,
   .btn.sec, .icon-btn, .article-es, .chip, .tag, .ghost-btn {
@@ -290,9 +290,9 @@ input, textarea, select { font-family: inherit; font-size: 15px; }
 }
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(900px 520px at 12% -8%, rgba(233, 30, 99, .22), transparent 60%),
-    radial-gradient(760px 460px at 105% 8%, rgba(194, 24, 91, .18), transparent 55%),
-    linear-gradient(160deg, #0a0a0c 0%, #160a12 48%, #2a0d18 100%);
+    radial-gradient(900px 520px at 12% -8%, rgba(255, 105, 180, .28), transparent 60%),
+    radial-gradient(760px 460px at 105% 8%, rgba(199, 21, 99, .22), transparent 55%),
+    linear-gradient(160deg, #2b0f1f 0%, #3d1233 48%, #4a1540 100%);
 }
 :root[data-theme="dark"] .card, :root[data-theme="dark"] .panel,
 :root[data-theme="dark"] .item, :root[data-theme="dark"] .sum .pill,
