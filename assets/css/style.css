@@ -38,7 +38,10 @@ html, body { height: 100%; }
 body {
   font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
   color: var(--text);
-  background: linear-gradient(160deg, var(--bg), var(--bg2));
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(255, 179, 198, .32), transparent 60%),
+    radial-gradient(760px 460px at 105% 8%, rgba(255, 214, 224, .4), transparent 55%),
+    linear-gradient(160deg, #fff6f7 0%, #ffe8ec 55%, #ffd9e4 100%);
   background-attachment: fixed;
   min-height: 100vh;
   -webkit-tap-highlight-color: transparent;
