@@ -17,25 +17,6 @@
   --shadow: 0 10px 30px rgba(233, 30, 99, .16);
   --radius: 20px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #2b0f1f;
-    --bg2: #4a1540;
-    --surface: #2c2438;
-    --surface2: #352b44;
-    --text: #f4eef7;
-    --text-soft: #cdb9d8;
-    --muted: #9a86aa;
-    --border: #42354f;
-    --primary: #ff6fa5;
-    --primary-d: #ff5c93;
-    --primary-soft: #3a2a40;
-    --good: #5fd0a3;
-    --bad: #ff8497;
-    --warn: #f0b860;
-    --shadow: 0 10px 30px rgba(0, 0, 0, .45);
-  }
-}
 :root[data-theme="light"] {
   --bg: #fff6f7; --bg2: #ffe8ec; --surface: #ffffff; --surface2: #fff0f3;
   --text: #4a1f29; --text-soft: #84424f; --muted: #b06b7b; --border: #ffcdd6;
@@ -248,45 +229,17 @@ input, textarea, select { font-family: inherit; font-size: 15px; }
 }
 @media (min-width: 821px) { .sidebar { transform: none !important; } }
 
-/* ===== 深色模式美化：黑红渐变 + 光晕 + 毛玻璃质感 ===== */
-/* 系统暗色 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --surface: rgba(60, 24, 48, .62);
-    --surface2: rgba(80, 30, 64, .5);
-    --border: rgba(255, 120, 160, .18);
-    --primary-soft: rgba(255, 92, 147, .14);
-    --shadow: 0 12px 34px rgba(0, 0, 0, .55);
-    --text: #fce8ee;
-    --text-soft: #e3b9c6;
-    --muted: #b08392;
-  }
-  body {
-    background:
-      radial-gradient(900px 520px at 12% -8%, rgba(255, 105, 180, .28), transparent 60%),
-      radial-gradient(760px 460px at 105% 8%, rgba(199, 21, 99, .22), transparent 55%),
-      linear-gradient(160deg, #2b0f1f 0%, #3d1233 48%, #4a1540 100%);
-  }
-  .card, .panel, .item, .sum .pill, .input, textarea.input, select.input,
-  .btn.sec, .icon-btn, .article-es, .chip, .tag, .ghost-btn {
-    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-    border-color: rgba(255, 120, 160, .16);
-  }
-  .card, .panel { box-shadow: 0 8px 26px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .04); }
-  .topbar, .sidebar { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-  .btn:hover { box-shadow: 0 6px 18px rgba(233, 30, 99, .4); }
-}
-/* 手动选“深色”时（与上面保持一致，覆盖 :root[data-theme="dark"] 的基础色） */
+/* ===== 深色模式美化：Hello Kitty 莓粉渐变 + 光晕 + 毛玻璃质感 ===== */
+/* 仅在显式选择“深色”时生效（不再跟随系统，避免污染浅色模式） */
 :root[data-theme="dark"] {
-  --surface: rgba(38, 26, 33, .66);
-  --surface2: rgba(58, 34, 44, .55);
+  --surface: rgba(60, 24, 48, .62);
+  --surface2: rgba(80, 30, 64, .5);
   --border: rgba(255, 120, 160, .18);
   --primary-soft: rgba(255, 92, 147, .14);
   --shadow: 0 12px 34px rgba(0, 0, 0, .55);
   --text: #fce8ee;
   --text-soft: #e3b9c6;
   --muted: #b08392;
-  --bg: #0a0a0c; --bg2: #2a0d18;
 }
 :root[data-theme="dark"] body {
   background:

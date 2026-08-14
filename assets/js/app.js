@@ -47,16 +47,16 @@
     document.getElementById('scrim').classList.remove('show');
   }
 
-  // 主题
-  const THEME_LABEL = { auto: '自动', light: '浅色', dark: '深色' };
+  // 主题（仅 浅色 / 深色 两态）
+  const THEME_LABEL = { light: '浅色', dark: '深色' };
   function applyTheme(t) {
     document.documentElement.setAttribute('data-theme', t);
     const lbl = document.getElementById('themeLabel'); if (lbl) lbl.textContent = THEME_LABEL[t];
   }
   function cycleTheme() {
-    const order = ['auto', 'light', 'dark'];
-    const cur = DB.get('theme', 'auto');
-    const next = order[(order.indexOf(cur) + 1) % 3];
+    const order = ['light', 'dark'];
+    const cur = DB.get('theme', 'light');
+    const next = order[(order.indexOf(cur) + 1) % order.length];
     DB.set('theme', next); applyTheme(next);
   }
 
@@ -77,7 +77,7 @@
 
   // 初始化
   function init() {
-    applyTheme(DB.get('theme', 'auto'));
+    applyTheme(DB.get('theme', 'light'));
     refreshHeader();
     buildNav();
     MODULES.find(m => m.key === active).render();
