@@ -30,10 +30,44 @@
   }
   function save(d, rerender = true) { DB.setDay(KEY, d); if (rerender) render(window.__view); }
 
+  // 结合当下新闻事实的每日西语短文（中西双语），每日轮换
+  const ARTICLES = [
+    {
+      title: 'Los Juegos Olímpicos de Invierno 2026',
+      es: 'Los Juegos Olímpicos de Invierno 2026 se celebraron en Milán y Cortina, Italia. China ganó cinco medallas de oro y logró su mejor resultado en unos Juegos de Invierno fuera de casa. La esquiadora Eileen Gu hizo historia con seis medallas en su carrera.',
+      zh: '2026 年冬奥会在意大利米兰-科尔蒂纳举行。中国夺得五枚金牌，创下境外冬奥会最佳战绩。滑雪运动员谷爱凌以职业生涯六枚奖牌成为历史最佳自由式滑雪选手。',
+      tip: '重点词：ganar（赢得）、medalla（奖牌）、oro（金）、lograr（实现/达成）。试着用“ganar”造一句你今天的成就。'
+    },
+    {
+      title: 'Un planeta escondido en el espacio',
+      es: 'El telescopio James Webb descubrió un planeta gigante escondido en el sistema Beta Pictoris, a 63 años luz de la Tierra. El planeta tiene al menos el doble de la masa de Júpiter y orbita como Neptuno en nuestro sistema solar.',
+      zh: '詹姆斯·韦伯望远镜在距地球 63 光年的绘架座 β 星系中发现了一颗隐藏的巨行星。它质量至少是木星的两倍，轨道位置类似太阳系中的海王星。',
+      tip: '重点词：descubrir（发现）、planeta（行星）、sistema（系统）、masa（质量）。可以在写作区用这些词写两句描述。'
+    },
+    {
+      title: 'El deporte une al mundo',
+      es: 'En los Juegos Olímpicos, atletas de más de 90 países compiten con respeto y amistad. Una pareja de China ganó oro en el mismo día, un momento muy emotivo que el mundo recordará.',
+      zh: '在奥运会上，来自 90 多个国家的运动员以尊重与友谊同场竞技。中国一对夫妻在同一天夺金，这一动人时刻将被世界铭记。',
+      tip: '重点词：competir（竞争/参赛）、respeto（尊重）、amistad（友谊）、emotivo（动人的）。练口语时试着复述这段话。'
+    },
+    {
+      title: 'La ciencia mira más lejos',
+      es: 'Los científicos usan telescopios poderosos para ver planetas lejanos. Cada descubrimiento nos ayuda a entender mejor el universo y nuestro lugar en él.',
+      zh: '科学家使用强大的望远镜观测遥远的星球。每一次发现都帮助我们更好地理解宇宙以及我们在其中的位置。',
+      tip: '重点词：científico（科学家）、universo（宇宙）、entender（理解）、lugar（位置）。今天听力练习可以找一段天文主题的西语播客。'
+    },
+  ];
+  function dailyArticle() {
+    const s = daySeed();
+    return ARTICLES[s % ARTICLES.length];
+  }
+
   function render(view) {
     window.__view = view;
     const d = today();
+    if (d.articleDone === undefined) d.articleDone = false;
     const known = d.words.filter(w => w.done).length;
+    const art = dailyArticle();
 
     const wordHtml = d.words.map((w, i) => `
       <div class="item">
@@ -56,6 +90,22 @@
           <button class="btn" id="wAdd">加</button>
         </div>
         <div id="wordList">${wordHtml}</div>
+      </div>
+
+      <div class="card">
+        <div class="head-row">
+          <h2>📰 今日西语短文</h2>
+          <span class="chip">结合当日新闻</span>
+        </div>
+        <div class="card-sub">${Util.pretty()} · 双语阅读 + 重点词</div>
+        <h3 style="margin:6px 0 8px">${Util.esc(art.title)}</h3>
+        <div class="article-es">${Util.esc(art.es)}</div>
+        <div class="article-zh">${Util.esc(art.zh)}</div>
+        <div class="article-tip">💡 ${Util.esc(art.tip)}</div>
+        <div class="row" style="align-items:center;margin-top:10px">
+          <div class="check ${d.articleDone ? 'on' : ''}" id="aChk">${d.articleDone ? '✓' : ''}</div>
+          <span>已读 + 重点词已练</span>
+        </div>
       </div>
 
       <div class="grid2">
@@ -105,6 +155,7 @@
     view.querySelector('#lMin').oninput = e => { d.listen.min = +e.target.value || 0; save(d, false); };
     view.querySelector('#sMin').oninput = e => { d.speak.min = +e.target.value || 0; save(d, false); };
     bind('#lChk', 'listen'); bind('#sChk', 'speak'); bind('#wChk', 'write'); bind('#wText', 'write', true);
+    view.querySelector('#aChk').onclick = () => { d.articleDone = !d.articleDone; save(d); };
   }
 
   window.Spanish = { render };

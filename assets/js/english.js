@@ -17,6 +17,34 @@
     const d = new Date(); const s = new Date(d.getFullYear(), 0, 0);
     return Math.floor((d - s) / 86400000);
   }
+  // 结合当下新闻事实的每日英文短文，每日轮换
+  const ARTICLES = [
+    {
+      title: 'Milano Cortina 2026 Winter Olympics',
+      en: "The 2026 Winter Olympics concluded in Milan and Cortina, Italy. China won five gold medals, its best result at an overseas Winter Games. Eileen Gu became the most decorated freestyle skier in Olympic history with six career medals.",
+      zh: '2026 年冬奥会在意大利米兰-科尔蒂纳闭幕。中国夺得五枚金牌，创下境外冬奥会最佳战绩。谷爱凌以六枚奖牌成为奥运史上获得奖牌最多的自由式滑雪运动员。',
+      tip: '词汇：conclude（闭幕/结束）、decorated（获奖无数的）、freestyle（自由式）。听力建议：BBC Learning English 搜 "sport" 主题。'
+    },
+    {
+      title: 'Webb Telescope Finds Hidden Giant Planet',
+      en: "NASA's James Webb Telescope discovered a hidden giant planet in the Beta Pictoris system, about 63 light-years from Earth. The planet, Beta Pictoris d, has at least twice the mass of Jupiter and was found through its atmospheric chemistry.",
+      zh: 'NASA 的詹姆斯·韦伯望远镜在距地球约 63 光年的绘架座 β 星系中发现一颗隐藏的巨行星。这颗名为 Beta Pictoris d 的行星质量至少是木星的两倍，是通过大气化学成分发现的。',
+      tip: '词汇：discover（发现）、atmospheric（大气的）、chemistry（化学）、light-year（光年）。口语建议：用 30 秒复述这段新闻。'
+    },
+    {
+      title: 'Olympic Spirit Brings the World Together',
+      en: "Athletes from over 90 countries competed with respect and friendship at the Winter Olympics. A married couple from China won gold on the same day, a touching moment the world will remember.",
+      zh: '来自 90 多个国家的运动员在冬奥会上以尊重与友谊同场竞技。中国一对夫妻在同一天夺金，这一感人时刻将被世界铭记。',
+      tip: '词汇：respect（尊重）、friendship（友谊）、touching（感人的）、compete（参赛）。写作建议：用这 3 个词写一段关于合作的短文。'
+    },
+    {
+      title: 'Science Looks Farther into Space',
+      en: "Scientists use powerful telescopes to study distant planets. Each discovery helps us better understand the universe and our place in it.",
+      zh: '科学家使用强大的望远镜研究遥远的星球。每一次发现都帮助我们更好地理解宇宙以及我们在其中的位置。',
+      tip: '词汇：telescope（望远镜）、distant（遥远的）、universe（宇宙）、discovery（发现）。听力建议：VOA Learning English 慢速新闻。'
+    },
+  ];
+  function dailyArticle() { return ARTICLES[daySeed() % ARTICLES.length]; }
   function studied() { return DB.day(KEY) || {}; }
   function saveStudied(obj) { DB.setDay(KEY, obj); }
 
@@ -33,6 +61,7 @@
     window.__view = view;
     const sd = studied();
     const pick = CH[daySeed() % CH.length];
+    const art = dailyArticle();
 
     const cards = CH.map(c => {
       const s = sd[c.user] || { min: 0, done: false };
@@ -61,6 +90,19 @@
         </div>
         <div class="card-sub">${Util.pretty()} · 精选油管播客/频道，点“刷新”拉最新视频</div>
         <p class="muted" style="font-size:12px;margin-bottom:6px">💡 学英语建议：先盲听→看字幕→跟读→复述。每日挑 1 个频道跟练 15–30 分钟。</p>
+
+        <div class="card" style="margin-bottom:12px">
+          <div class="head-row">
+            <h2>📰 今日英文短文</h2>
+            <span class="chip">结合当日新闻</span>
+          </div>
+          <div class="card-sub">${Util.pretty()} · 双语阅读 + 词汇提示</div>
+          <h3 style="margin:6px 0 8px">${Util.esc(art.title)}</h3>
+          <div class="article-es">${Util.esc(art.en)}</div>
+          <div class="article-zh">${Util.esc(art.zh)}</div>
+          <div class="article-tip">💡 ${Util.esc(art.tip)}</div>
+        </div>
+
         <div id="engList" style="display:flex;flex-direction:column;gap:10px">${cards}</div>
       </div>`;
 

@@ -32,6 +32,21 @@
     return out;
   }
 
+  // 根据当日摄入/消耗给出可执行的当日运动建议
+  function advice(d, inK, outK, net) {
+    const tips = [];
+    if (outK <= 0) tips.push('今天还没运动哦，建议先做 20–30 分钟有氧（快走/慢跑/跳绳）唤醒身体。');
+    if (net > 600) tips.push(`今日净摄入偏高（+${Math.round(net)} kcal），建议加一组 30 分钟中高强度运动（如 HIIT、骑车）帮助消耗。`);
+    else if (net > 200) tips.push(`净摄入 +${Math.round(net)} kcal，适度运动 20 分钟即可平衡，散步或瑜伽都合适。`);
+    else if (net <= 0) tips.push('今天热量已呈负平衡，状态不错！可做一些拉伸或力量训练塑形，别空腹运动。');
+    else tips.push('热量基本平衡，保持日常活动量就好，记得多喝水 💧。');
+    if (d.water < 6) tips.push(`今天只记了 ${d.water} 杯水，建议每日饮水 6–8 杯，帮助代谢。`);
+    // 蛋白/蔬菜等轻提示
+    const hasVeg = (d.food || []).some(f => /蔬|菜|果|salad|菜/.test(f.name));
+    if (!hasVeg) tips.push('今日饮食记录里暂未见蔬果，记得补充一份蔬菜或水果，均衡饮食更轻盈。');
+    return tips;
+  }
+
   function render(view) {
     window.__view = view;
     const d = today();
@@ -54,6 +69,7 @@
         <div class="bar-val">${t.net > 0 ? '+' : ''}${Math.round(t.net)}</div>
       </div>`).join('');
 
+    const tips = advice(d, inK, outK, net);
     view.innerHTML = `
       <div class="card">
         <h2>🥗 运动饮食记录</h2>
@@ -68,6 +84,14 @@
           <button class="btn sec" id="wMinus">－杯水</button>
           <button class="btn sec" id="wPlus">＋杯水</button>
         </div>
+      </div>
+
+      <div class="card advice-card">
+        <h2>💡 今日运动建议</h2>
+        <div class="card-sub">根据今日摄入/消耗与饮水智能生成</div>
+        <ul class="advice-list">
+          ${tips.map(t => `<li>${Util.esc(t)}</li>`).join('')}
+        </ul>
       </div>
 
       <div class="card">
