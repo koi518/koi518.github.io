@@ -1,16 +1,15 @@
 /* ===== 主程序：导航 / 主题 / 路由 ===== */
 (function () {
-  // 8 个模块形象（Hello Kitty 主题图）
-  const IMG = 'assets/img/mascots/';
+  // 8 个模块头像（文字“我的”圆形徽标）
   const MODULES = [
-    { key: 'fortune', name: '每日运势', img: IMG + '7.png', render: () => window.Fortune.render(view) },
-    { key: 'todo', name: '待办清单', img: IMG + '1.png', render: () => window.Todo.render(view) },
-    { key: 'finance', name: '每日记账', img: IMG + '6.png', render: () => window.Finance.render(view) },
-    { key: 'spanish', name: '西语学习', img: IMG + '4.png', render: () => window.Spanish.render(view) },
-    { key: 'english', name: '英语学习', img: IMG + '8.png', render: () => window.English.render(view) },
-    { key: 'financenews', name: '金融信息', img: IMG + '5.png', render: () => window.FinanceNews.render(view) },
-    { key: 'ainews', name: 'AI 播报', img: IMG + '2.png', render: () => window.AINews.render(view) },
-    { key: 'health', name: '运动饮食', img: IMG + '3.png', render: () => window.Health.render(view) },
+    { key: 'fortune', name: '每日运势', emoji: '我的', render: () => window.Fortune.render(view) },
+    { key: 'todo', name: '待办清单', emoji: '我的', render: () => window.Todo.render(view) },
+    { key: 'finance', name: '每日记账', emoji: '我的', render: () => window.Finance.render(view) },
+    { key: 'spanish', name: '西语学习', emoji: '我的', render: () => window.Spanish.render(view) },
+    { key: 'english', name: '英语学习', emoji: '我的', render: () => window.English.render(view) },
+    { key: 'financenews', name: '金融信息', emoji: '我的', render: () => window.FinanceNews.render(view) },
+    { key: 'ainews', name: 'AI 播报', emoji: '我的', render: () => window.AINews.render(view) },
+    { key: 'health', name: '运动饮食', emoji: '我的', render: () => window.Health.render(view) },
   ];
 
   const view = document.getElementById('view');
@@ -72,7 +71,7 @@
     const h = now.getHours();
     const g = h < 6 ? '凌晨好' : h < 12 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
     document.getElementById('greet').textContent = `${g}，${SITE.name} 💕`;
-    document.getElementById('brandMascot').innerHTML = `<img src="${IMG}9.png" alt="">`;
+    document.getElementById('brandMascot').textContent = '我的';
   }
 
   // 初始化
