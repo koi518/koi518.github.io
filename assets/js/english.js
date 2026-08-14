@@ -45,6 +45,20 @@
     },
   ];
   function dailyArticle() { return ARTICLES[daySeed() % ARTICLES.length]; }
+  // 每日英语单句（英→中），每日轮换
+  const SENTENCES = [
+    ['Practice makes perfect.', '熟能生巧。'],
+    ['A little progress each day adds up to big results.', '每天的微小进步，终将累积成大成果。'],
+    ['Learning a language opens new doors.', '学一门语言会打开新的大门。'],
+    ['Consistency is the key to success.', '坚持是成功的关键。'],
+    ['Mistakes are part of learning.', '犯错是学习的一部分。'],
+    ['Read every day, even just a little.', '每天都要阅读，哪怕只是一点点。'],
+    ['Speak out loud to build confidence.', '大声说出来，建立自信。'],
+    ['Curiosity keeps the mind young.', '好奇心让头脑保持年轻。'],
+    ['Today is a good day to start.', '今天就是开始的好日子。'],
+    ['Small steps lead to big changes.', '一小步也能带来大改变。'],
+  ];
+  function dailySentence() { return SENTENCES[daySeed() % SENTENCES.length]; }
   function studied() { return DB.day(KEY) || {}; }
   function saveStudied(obj) { DB.setDay(KEY, obj); }
 
@@ -62,6 +76,7 @@
     const sd = studied();
     const pick = CH[daySeed() % CH.length];
     const art = dailyArticle();
+    const sen = dailySentence();
 
     const cards = CH.map(c => {
       const s = sd[c.user] || { min: 0, done: false };
@@ -90,6 +105,16 @@
         </div>
         <div class="card-sub">${Util.pretty()} · 精选油管播客/频道，点“刷新”拉最新视频</div>
         <p class="muted" style="font-size:12px;margin-bottom:6px">💡 学英语建议：先盲听→看字幕→跟读→复述。每日挑 1 个频道跟练 15–30 分钟。</p>
+
+        <div class="card" style="margin-bottom:12px">
+          <div class="head-row">
+            <h2>💬 今日英语单句</h2>
+            <span class="chip">每日轮换</span>
+          </div>
+          <div class="card-sub">${Util.pretty()} · 跟读 + 翻译练习</div>
+          <h3 style="margin:6px 0 8px">${Util.esc(sen[0])}</h3>
+          <div class="article-zh">${Util.esc(sen[1])}</div>
+        </div>
 
         <div class="card" style="margin-bottom:12px">
           <div class="head-row">
