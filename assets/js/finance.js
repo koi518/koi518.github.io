@@ -12,18 +12,18 @@
 
   function load() { return DB.get(KEY, {}); }
   function save(all) { DB.set(KEY, all); }
-  function todayList() { return load()[Util.dateKey()] || []; }
+  function listOf(dk) { return load()[dk] || []; }
 
   function add(amount, cat, note) {
     amount = parseFloat(amount); if (!(amount > 0)) return;
-    const all = load(); const d = Util.dateKey();
-    all[d] = all[d] || [];
-    all[d].push({ id: Util.uid(), type, amount, cat, note: (note || '').trim(), ts: Date.now() });
+    const dk = DayNav.get(KEY); const all = load();
+    all[dk] = all[dk] || [];
+    all[dk].push({ id: Util.uid(), type, amount, cat, note: (note || '').trim(), ts: Date.now() });
     save(all); render(window.__view);
   }
   function del(id) {
-    const all = load(); const arr = all[Util.dateKey()] || [];
-    all[Util.dateKey()] = arr.filter(x => x.id !== id);
+    const dk = DayNav.get(KEY); const all = load(); const arr = all[dk] || [];
+    all[dk] = arr.filter(x => x.id !== id);
     save(all); render(window.__view);
   }
 
@@ -69,17 +69,18 @@
 
   function render(view) {
     window.__view = view;
-    const list = todayList();
+    const dk = DayNav.get(KEY);
+    const list = listOf(dk);
     const st = monthStat();
     const rows = list.length ? list.map(r => `
       <div class="item">
         <div class="meta">
           <div class="title">${Util.esc(r.cat)}${r.note ? ' · ' + Util.esc(r.note) : ''}</div>
-          <div class="sub">${Util.dateKey()} ${r.type === 'in' ? '收入' : '支出'}</div>
+          <div class="sub">${dk} ${r.type === 'in' ? '收入' : '支出'}</div>
         </div>
         <div style="font-weight:700;color:${r.type === 'in' ? 'var(--good)' : 'var(--bad)'}">${r.type === 'in' ? '+' : '-'}${Util.money(r.amount)}</div>
         <button class="del" data-id="${r.id}">✕</button>
-      </div>`).join('') : '<div class="empty">今天还没记账～</div>';
+      </div>`).join('') : '<div class="empty">这一天还没记账～</div>';
 
     const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]);
     const max = cats.length ? cats[0][1] : 1;
@@ -107,9 +108,11 @@
     const opt = (type === 'in' ? IN_CAT : OUT_CAT).map(c => `<option>${c}</option>`).join('');
 
     view.innerHTML = `
+      ${DayNav.bar(KEY)}
+
       <div class="card">
         <h2>💰 每日记账</h2>
-        <div class="card-sub">${Util.pretty()} · 随手记，月末看趋势</div>
+        <div class="card-sub">${Util.pretty(new Date(dk + 'T00:00:00'))} · 随手记，月末看趋势</div>
         <div class="row" style="margin-bottom:10px">
           <div style="display:flex;gap:8px">
             <button class="btn ${type === 'out' ? '' : 'sec'}" data-type="out">支出</button>
@@ -137,7 +140,18 @@
         ${donutChart(st.byCat)}
         <div style="font-size:13px;color:var(--muted);margin:16px 0 8px">📈 近 15 天每日支出趋势</div>
         <div class="trend">${trend}</div>
-      </div>`;
+      </div>
+
+      ${DayNav.history(KEY, (ddk, arr) => {
+        const in_ = (arr || []).filter(r => r.type === 'in').reduce((s, r) => s + r.amount, 0);
+        const out = (arr || []).filter(r => r.type === 'out').reduce((s, r) => s + r.amount, 0);
+        const outL = out > 0 ? '支出 ' + Util.money(out) : '';
+        const inL = in_ > 0 ? '收入 ' + Util.money(in_) : '';
+        return `<div class="item" data-dn-row="${KEY}" data-dk="${ddk}" style="cursor:pointer">
+          <div class="meta"><div class="title">${Util.pretty(new Date(ddk + 'T00:00:00'))}</div><div class="sub">${(arr || []).length} 笔</div></div>
+          <div style="font-weight:700;color:${out > in_ ? 'var(--bad)' : 'var(--good)'};text-align:right">${outL}${inL ? ' · ' + inL : ''}</div>
+        </div>`;
+      })}`;
 
     view.querySelectorAll('[data-type]').forEach(b => b.onclick = () => { type = b.dataset.type; render(view); });
     view.querySelector('#fAdd').onclick = () => {
@@ -145,6 +159,7 @@
       add(a, view.querySelector('#fCat').value, view.querySelector('#fNote').value);
     };
     view.querySelectorAll('#fList .del').forEach(b => b.onclick = () => del(b.dataset.id));
+    DayNav.bind(view, KEY, () => render(view));
   }
 
   window.Finance = { render };

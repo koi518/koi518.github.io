@@ -13,8 +13,9 @@
   const PROXY = 'https://api.allorigins.win/raw?url=';
   const RSS = u => `https://www.youtube.com/feeds/videos.xml?user=${u}`;
 
-  function daySeed() {
-    const d = new Date(); const s = new Date(d.getFullYear(), 0, 0);
+  // 按日期算“第几天”，保证历史日显示当天的轮换内容
+  function seedFor(dk) {
+    const d = new Date(dk + 'T00:00:00'); const s = new Date(d.getFullYear(), 0, 0);
     return Math.floor((d - s) / 86400000);
   }
   // 结合当下新闻事实的每日英文短文，每日轮换
@@ -44,7 +45,7 @@
       tip: '词汇：telescope（望远镜）、distant（遥远的）、universe（宇宙）、discovery（发现）。听力建议：VOA Learning English 慢速新闻。'
     },
   ];
-  function dailyArticle() { return ARTICLES[daySeed() % ARTICLES.length]; }
+  function dailyArticle(dk) { return ARTICLES[seedFor(dk) % ARTICLES.length]; }
   // 每日英语单句（英→中），每日轮换
   const SENTENCES = [
     ['Practice makes perfect.', '熟能生巧。'],
@@ -58,9 +59,10 @@
     ['Today is a good day to start.', '今天就是开始的好日子。'],
     ['Small steps lead to big changes.', '一小步也能带来大改变。'],
   ];
-  function dailySentence() { return SENTENCES[daySeed() % SENTENCES.length]; }
-  function studied() { return DB.day(KEY) || {}; }
-  function saveStudied(obj) { DB.setDay(KEY, obj); }
+  function dailySentence(dk) { return SENTENCES[seedFor(dk) % SENTENCES.length]; }
+
+  function studied(dk = DayNav.get(KEY)) { return DB.day(KEY, dk) || {}; }
+  function saveStudied(obj, dk = DayNav.get(KEY)) { DB.setDay(KEY, obj, dk); }
 
   async function fetchLatest(ch) {
     try {
@@ -73,10 +75,11 @@
 
   function render(view) {
     window.__view = view;
-    const sd = studied();
-    const pick = CH[daySeed() % CH.length];
-    const art = dailyArticle();
-    const sen = dailySentence();
+    const dk = DayNav.get(KEY);
+    const sd = studied(dk);
+    const pick = CH[seedFor(dk) % CH.length];
+    const art = dailyArticle(dk);
+    const sen = dailySentence(dk);
 
     const cards = CH.map(c => {
       const s = sd[c.user] || { min: 0, done: false };
@@ -98,12 +101,14 @@
     }).join('');
 
     view.innerHTML = `
+      ${DayNav.bar(KEY)}
+
       <div class="card">
         <div class="head-row">
           <h2>🎬 英语学习台</h2>
           <button class="btn ghost" id="engRefresh">🔄 刷新最新</button>
         </div>
-        <div class="card-sub">${Util.pretty()} · 精选油管播客/频道，点“刷新”拉最新视频</div>
+        <div class="card-sub">${Util.pretty(new Date(dk + 'T00:00:00'))} · 精选油管播客/频道，点“刷新”拉最新视频</div>
         <p class="muted" style="font-size:12px;margin-bottom:6px">💡 学英语建议：先盲听→看字幕→跟读→复述。每日挑 1 个频道跟练 15–30 分钟。</p>
 
         <div class="card" style="margin-bottom:12px">
@@ -111,7 +116,7 @@
             <h2>💬 今日英语单句</h2>
             <span class="chip">每日轮换</span>
           </div>
-          <div class="card-sub">${Util.pretty()} · 跟读 + 翻译练习</div>
+          <div class="card-sub">${Util.pretty(new Date(dk + 'T00:00:00'))} · 跟读 + 翻译练习</div>
           <h3 style="margin:6px 0 8px">${Util.esc(sen[0])}</h3>
           <div class="article-zh">${Util.esc(sen[1])}</div>
         </div>
@@ -121,7 +126,7 @@
             <h2>📰 今日英文短文</h2>
             <span class="chip">结合当日新闻</span>
           </div>
-          <div class="card-sub">${Util.pretty()} · 双语阅读 + 词汇提示</div>
+          <div class="card-sub">${Util.pretty(new Date(dk + 'T00:00:00'))} · 双语阅读 + 词汇提示</div>
           <h3 style="margin:6px 0 8px">${Util.esc(art.title)}</h3>
           <div class="article-es">${Util.esc(art.en)}</div>
           <div class="article-zh">${Util.esc(art.zh)}</div>
@@ -129,16 +134,26 @@
         </div>
 
         <div id="engList" style="display:flex;flex-direction:column;gap:10px">${cards}</div>
-      </div>`;
+      </div>
+
+      ${DayNav.history(KEY, (ddk, dd) => {
+        const chs = Object.keys(dd).length;
+        const mins = Object.values(dd).reduce((s, o) => s + (o.min || 0), 0);
+        const doneCh = Object.values(dd).filter(o => o.done).length;
+        return `<div class="item" data-dn-row="${KEY}" data-dk="${ddk}" style="cursor:pointer">
+          <div class="meta"><div class="title">${Util.pretty(new Date(ddk + 'T00:00:00'))}</div><div class="sub">${chs} 个频道 · 学 ${mins} 分</div></div>
+          <div style="font-weight:700">${doneCh}/${chs}</div>
+        </div>`;
+      })}`;
 
     // 勾选 / 分钟
     view.querySelectorAll('[data-chk]').forEach(el => el.onclick = () => {
-      const u = el.dataset.chk; const o = studied(); o[u] = o[u] || { min: 0, done: false };
-      o[u].done = !o[u].done; saveStudied(o); render(view);
+      const u = el.dataset.chk; const o = studied(dk); o[u] = o[u] || { min: 0, done: false };
+      o[u].done = !o[u].done; saveStudied(o, dk); render(view);
     });
     view.querySelectorAll('[data-min]').forEach(el => el.oninput = () => {
-      const u = el.dataset.min; const o = studied(); o[u] = o[u] || { min: 0, done: false };
-      o[u].min = +el.value || 0; saveStudied(o);
+      const u = el.dataset.min; const o = studied(dk); o[u] = o[u] || { min: 0, done: false };
+      o[u].min = +el.value || 0; saveStudied(o, dk);
     });
 
     // 刷新最新视频
@@ -154,6 +169,8 @@
     };
     // 首次自动拉一次（轻量）
     refresh.onclick();
+
+    DayNav.bind(view, KEY, () => render(view));
   }
 
   window.English = { render };

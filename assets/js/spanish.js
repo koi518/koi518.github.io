@@ -17,22 +17,30 @@
     ['Aprendí una palabra nueva hoy.', '我今天学了一个新词。'],
   ];
 
-  function daySeed() {
-    const d = new Date(); const start = new Date(d.getFullYear(), 0, 0);
+  // 按日期算“第几天”，保证历史日显示当天的轮换内容
+  function seedFor(dk) {
+    const d = new Date(dk + 'T00:00:00'); const start = new Date(d.getFullYear(), 0, 0);
     return Math.floor((d - start) / 86400000);
   }
-  function dailySentences() {
-    const s = daySeed(); const out = [];
+  function dailySentences(dk) {
+    const s = seedFor(dk); const out = [];
     for (let i = 0; i < 5; i++) out.push(SENTENCES[(s + i) % SENTENCES.length]);
     return out.map(([t, m]) => ({ t, m, done: false }));
   }
 
-  function today() {
-    let d = DB.day(KEY);
-    if (!d) { d = { sentences: dailySentences(), listen: { min: 0, done: false }, write: { text: '', done: false }, speak: { min: 0, done: false } }; DB.setDay(KEY, d); }
-    return d;
+  // 取某天数据（不自动写库，避免污染历史）
+  function getDay(dk = DayNav.get(KEY)) {
+    return DB.day(KEY, dk) || {
+      sentences: dailySentences(dk),
+      listen: { min: 0, done: false },
+      write: { text: '', done: false },
+      speak: { min: 0, done: false },
+      articleDone: false,
+    };
   }
-  function save(d, rerender = true) { DB.setDay(KEY, d); if (rerender) render(window.__view); }
+  function save(d, dk = DayNav.get(KEY), rerender = true) {
+    DB.setDay(KEY, d, dk); if (rerender) render(window.__view);
+  }
 
   // 结合当下新闻事实的每日西语短文（中西双语），每日轮换
   const ARTICLES = [
@@ -61,17 +69,15 @@
       tip: '重点词：científico（科学家）、universo（宇宙）、entender（理解）、lugar（位置）。今天听力练习可以找一段天文主题的西语播客。'
     },
   ];
-  function dailyArticle() {
-    const s = daySeed();
-    return ARTICLES[s % ARTICLES.length];
-  }
+  function dailyArticle(dk) { return ARTICLES[seedFor(dk) % ARTICLES.length]; }
 
   function render(view) {
     window.__view = view;
-    const d = today();
+    const dk = DayNav.get(KEY);
+    const d = getDay(dk);
     if (d.articleDone === undefined) d.articleDone = false;
     const known = d.sentences.filter(w => w.done).length;
-    const art = dailyArticle();
+    const art = dailyArticle(dk);
 
     const wordHtml = d.sentences.map((w, i) => `
       <div class="item">
@@ -80,12 +86,14 @@
       </div>`).join('');
 
     view.innerHTML = `
+      ${DayNav.bar(KEY)}
+
       <div class="card">
         <div class="head-row">
           <h2>🇪🇸 西语学习台</h2>
           <span class="chip">已读 ${known}/${d.sentences.length}</span>
         </div>
-        <div class="card-sub">${Util.pretty()} · 每日轮换单句 + 听说写打卡</div>
+        <div class="card-sub">${Util.pretty(new Date(dk + 'T00:00:00'))} · 每日轮换单句 + 听说写打卡</div>
 
         <h3 style="margin:6px 0 8px">📝 今日单句（点勾表示已读会）</h3>
         <div class="row" style="margin-bottom:10px">
@@ -101,7 +109,7 @@
           <h2>📰 今日西语短文</h2>
           <span class="chip">结合当日新闻</span>
         </div>
-        <div class="card-sub">${Util.pretty()} · 双语阅读 + 重点词</div>
+        <div class="card-sub">${Util.pretty(new Date(dk + 'T00:00:00'))} · 双语阅读 + 重点词</div>
         <h3 style="margin:6px 0 8px">${Util.esc(art.title)}</h3>
         <div class="article-es">${Util.esc(art.es)}</div>
         <div class="article-zh">${Util.esc(art.zh)}</div>
@@ -119,7 +127,7 @@
           <input class="input" id="lMin" type="number" value="${d.listen.min}" style="margin:6px 0" />
           <div class="row" style="align-items:center">
             <div class="check ${d.listen.done ? 'on' : ''}" id="lChk">${d.listen.done ? '✓' : ''}</div>
-            <span>今日已完成</span>
+            <span>当日已完成</span>
           </div>
         </div>
         <div class="panel">
@@ -128,7 +136,7 @@
           <input class="input" id="sMin" type="number" value="${d.speak.min}" style="margin:6px 0" />
           <div class="row" style="align-items:center">
             <div class="check ${d.speak.done ? 'on' : ''}" id="sChk">${d.speak.done ? '✓' : ''}</div>
-            <span>今日已完成</span>
+            <span>当日已完成</span>
           </div>
         </div>
       </div>
@@ -138,9 +146,19 @@
         <textarea class="input" id="wText" rows="3" placeholder="写几句西语试试～">${Util.esc(d.write.text)}</textarea>
         <div class="row" style="align-items:center;margin-top:8px">
           <div class="check ${d.write.done ? 'on' : ''}" id="wChk">${d.write.done ? '✓' : ''}</div>
-          <span>今日已完成</span>
+          <span>当日已完成</span>
         </div>
-      </div>`;
+      </div>
+
+      ${DayNav.history(KEY, (ddk, dd) => {
+        const total = (dd.sentences || []).length;
+        const kwn = (dd.sentences || []).filter(w => w.done).length;
+        const mins = (dd.listen ? dd.listen.min : 0) + (dd.speak ? dd.speak.min : 0);
+        return `<div class="item" data-dn-row="${KEY}" data-dk="${ddk}" style="cursor:pointer">
+          <div class="meta"><div class="title">${Util.pretty(new Date(ddk + 'T00:00:00'))}</div><div class="sub">单句 ${kwn}/${total} · 听说 ${mins} 分</div></div>
+          <div style="font-weight:700">${kwn}/${total}</div>
+        </div>`;
+      })}`;
 
     // 单句勾选 / 添加
     view.querySelectorAll('[data-w]').forEach(el => el.onclick = () => {
@@ -153,13 +171,15 @@
     // 听说写
     const bind = (sel, key, isText) => {
       const el = view.querySelector(sel);
-      if (isText) el.oninput = () => { d[key].text = el.value; save(d, false); };
+      if (isText) el.oninput = () => { d[key].text = el.value; save(d, DayNav.get(KEY), false); };
       else el.onclick = () => { d[key].done = !d[key].done; save(d); };
     };
-    view.querySelector('#lMin').oninput = e => { d.listen.min = +e.target.value || 0; save(d, false); };
-    view.querySelector('#sMin').oninput = e => { d.speak.min = +e.target.value || 0; save(d, false); };
+    view.querySelector('#lMin').oninput = e => { d.listen.min = +e.target.value || 0; save(d, DayNav.get(KEY), false); };
+    view.querySelector('#sMin').oninput = e => { d.speak.min = +e.target.value || 0; save(d, DayNav.get(KEY), false); };
     bind('#lChk', 'listen'); bind('#sChk', 'speak'); bind('#wChk', 'write'); bind('#wText', 'write', true);
     view.querySelector('#aChk').onclick = () => { d.articleDone = !d.articleDone; save(d); };
+
+    DayNav.bind(view, KEY, () => render(view));
   }
 
   window.Spanish = { render };
