@@ -173,5 +173,5 @@
     DayNav.bind(view, KEY, () => render(view));
   }
 
-  window.English = { render };
+  window.English = { render, sentence: dailySentence, article: dailyArticle, channels: CH };
 })();
