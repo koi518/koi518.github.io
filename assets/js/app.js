@@ -204,6 +204,26 @@
         if (a.length > 1) sheets['英语'] = a;
       }
 
+      // 月度汇总
+      {
+        const months = {};
+        const add = (mk) => months[mk] || (months[mk] = { income: 0, expense: 0, inK: 0, exK: 0, todoDone: 0, todoTotal: 0, esDays: 0, enMin: 0 });
+        const fin = get('finance');
+        Object.keys(fin).forEach(dk => (fin[dk] || []).forEach(r => { const o = add(dk.slice(0, 7)); if (r.type === 'in') o.income += r.amount; else o.expense += r.amount; }));
+        const h = get('health');
+        Object.keys(h).forEach(dk => { const d = h[dk] || {}; const o = add(dk.slice(0, 7)); (d.food || []).forEach(f => o.inK += f.kcal || 0); (d.ex || []).forEach(e => o.exK += e.kcal || 0); });
+        const td = get('todo');
+        Object.keys(td).forEach(dk => (td[dk] || []).forEach(r => { const o = add(dk.slice(0, 7)); o.todoTotal++; if (r.done) o.todoDone++; }));
+        const sp = get('spanish');
+        Object.keys(sp).forEach(dk => { const d = sp[dk] || {}; const arr = d.sentences || []; const active = arr.length > 0 || (d.listen && d.listen.min) || (d.speak && d.speak.min) || (d.write && d.write.text) || d.articleDone; if (active) add(dk.slice(0, 7)).esDays++; });
+        const en = get('english');
+        Object.keys(en).forEach(dk => { const d = en[dk] || {}; const o = add(dk.slice(0, 7)); Object.keys(d).forEach(ch => { const s = d[ch] || {}; o.enMin += s.min || 0; }); });
+        const ks = Object.keys(months).sort();
+        const a = [['月份', '记账收入(元)', '记账支出(元)', '记账净额(元)', '运动摄入(kcal)', '运动消耗(kcal)', '运动净(kcal)', '待办完成/总数', '西语打卡天', '英语学习(分钟)']];
+        ks.forEach(mk => { const o = months[mk]; a.push([mk, o.income, o.expense, o.income - o.expense, o.inK, o.exK, o.inK - o.exK, `${o.todoDone}/${o.todoTotal}`, o.esDays, o.enMin]); });
+        if (ks.length) sheets['月度汇总'] = a;
+      }
+
       if (Object.keys(sheets).length === 0) { alert('当前还没有可导出的记录数据'); return; }
 
       const wb = XLSX.utils.book_new();
@@ -218,6 +238,32 @@
       ]), '导出说明');
 
       XLSX.writeFile(wb, `小昕工作台-数据-${stamp}.xlsx`);
+    };
+
+    // 导出 CSV（单文件统一活动流，UTF-8 BOM 防乱码）
+    document.getElementById('exportCsvBtn').onclick = () => {
+      const get = (k) => DB.get(k, {});
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+      const cell = (v) => { const s = String(v == null ? '' : v); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+      const rows = [['模块', '日期', '类别', '名称', '数值', '单位', '备注']];
+      const fin = get('finance');
+      Object.keys(fin).sort().forEach(dk => (fin[dk] || []).forEach(r => rows.push(['记账', dk, r.type === 'in' ? '收入' : '支出', r.cat, r.amount, '元', r.note || ''])));
+      const td = get('todo');
+      Object.keys(td).sort().forEach(dk => (td[dk] || []).forEach(r => rows.push(['待办', dk, '任务', r.text, '', '', r.done ? '已完成' : '未完成'])));
+      const h = get('health');
+      Object.keys(h).sort().forEach(dk => { const d = h[dk] || {}; (d.food || []).forEach(f => rows.push(['运动饮食', dk, '饮食(摄入)', f.name, f.kcal, 'kcal', ''])); (d.ex || []).forEach(e => rows.push(['运动饮食', dk, '运动(消耗)', e.name, e.kcal, 'kcal', ''])); if (d.water) rows.push(['运动饮食', dk, '饮水', d.water, d.water, 'ml', '']); });
+      const sp = get('spanish');
+      Object.keys(sp).sort().forEach(dk => { const d = sp[dk] || {}; const arr = d.sentences || []; if (arr.length === 0) { if (d.listen || d.speak || d.write || d.articleDone) rows.push(['西语', dk, '汇总', `听力${d.listen ? d.listen.min : 0}/口语${d.speak ? d.speak.min : 0}分`, '', '', '短文' + (d.articleDone ? '已完成' : '未完成')]); } else arr.forEach(s => rows.push(['西语', dk, '单句', s.t + ' / ' + s.m, '', '', s.done ? '已掌握' : ''])); });
+      const en = get('english');
+      Object.keys(en).sort().forEach(dk => { const d = en[dk] || {}; Object.keys(d).forEach(ch => { const s = d[ch] || {}; rows.push(['英语', dk, ch, '学习' + (s.min || 0) + '分钟', '', '', '完成:' + (s.done ? '是' : '否')]); }); });
+      if (rows.length === 1) { alert('当前还没有可导出的记录数据'); return; }
+      const csv = '﻿' + rows.map(r => r.map(cell).join(',')).join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `小昕工作台-数据-${stamp}.csv`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
     };
 
     // 导入数据（覆盖同名）

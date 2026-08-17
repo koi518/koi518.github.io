@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#e91e63" />
   <title>小昕 · 个人工作台</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=20260817c" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260817d" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍼</text></svg>" />
 </head>
 <body>
@@ -53,20 +53,20 @@
     </main>
   </div>
 
-  <script src="assets/vendor/lunar.js?v=20260817c"></script>
-  <script src="assets/vendor/xlsx.full.min.js?v=20260817c"></script>
-  <script src="assets/js/store.js?v=20260817c"></script>
-  <script src="assets/js/daynav.js?v=20260817c"></script>
-  <script src="assets/js/seed.js?v=20260817c"></script>
-  <script src="assets/js/fortune.js?v=20260817c"></script>
-  <script src="assets/js/todo.js?v=20260817c"></script>
-  <script src="assets/js/finance.js?v=20260817c"></script>
-  <script src="assets/js/spanish.js?v=20260817c"></script>
-  <script src="assets/js/english.js?v=20260817c"></script>
-  <script src="assets/js/financenews.js?v=20260817c"></script>
-  <script src="assets/js/ainews.js?v=20260817c"></script>
-  <script src="assets/js/health.js?v=20260817c"></script>
-  <script src="assets/js/app.js?v=20260817c"></script>
+  <script src="assets/vendor/lunar.js?v=20260817d"></script>
+  <script src="assets/vendor/xlsx.full.min.js?v=20260817d"></script>
+  <script src="assets/js/store.js?v=20260817d"></script>
+  <script src="assets/js/daynav.js?v=20260817d"></script>
+  <script src="assets/js/seed.js?v=20260817d"></script>
+  <script src="assets/js/fortune.js?v=20260817d"></script>
+  <script src="assets/js/todo.js?v=20260817d"></script>
+  <script src="assets/js/finance.js?v=20260817d"></script>
+  <script src="assets/js/spanish.js?v=20260817d"></script>
+  <script src="assets/js/english.js?v=20260817d"></script>
+  <script src="assets/js/financenews.js?v=20260817d"></script>
+  <script src="assets/js/ainews.js?v=20260817d"></script>
+  <script src="assets/js/health.js?v=20260817d"></script>
+  <script src="assets/js/app.js?v=20260817d"></script>
 
   <!-- 设置弹窗 -->
   <div class="modal" id="settingsModal">
@@ -89,6 +89,13 @@
             <div class="set-sub">按模块分工作表（记账 / 待办 / 运动饮食 / 西语 / 英语），可直接用 Excel / WPS 打开查看分析。</div>
           </div>
           <button class="btn sec" id="exportExcelBtn">导出 .xlsx</button>
+        </div>
+        <div class="set-row">
+          <div>
+            <div class="set-title">导出 CSV 表格</div>
+            <div class="set-sub">导出为单个 CSV 文件（统一活动流：模块 / 日期 / 类别 / 名称 / 数值），UTF-8 编码，Excel / WPS / 记事本均可打开。</div>
+          </div>
+          <button class="btn sec" id="exportCsvBtn">导出 .csv</button>
         </div>
         <div class="set-row">
           <div>
