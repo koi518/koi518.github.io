@@ -318,7 +318,11 @@
       try {
         await ensureBranch(cfg);
         const data = {};
-        for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); data[k] = localStorage.getItem(k); }
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k === 'wb_syncCfg' || k.includes('token') || k.includes('secret') || k.includes('password')) continue;
+          data[k] = localStorage.getItem(k);
+        }
         const content = b64enc(JSON.stringify(data));
         let sha = '';
         const get = await gh(`/repos/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}`);
@@ -341,7 +345,9 @@
         const j = await get.json();
         const data = JSON.parse(b64dec(j.content));
         if (!confirm('下载会用云端数据覆盖本地同名数据，确定继续？')) { setSyncStatus('已取消'); return; }
+        const localSyncCfg = localStorage.getItem('wb_syncCfg');
         Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+        if (localSyncCfg) localStorage.setItem('wb_syncCfg', localSyncCfg);
         location.reload();
       } catch (err) { setSyncStatus('❌ ' + err.message, true); }
     }
