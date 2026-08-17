@@ -71,7 +71,8 @@
     const h = now.getHours();
     const g = h < 6 ? '凌晨好' : h < 12 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
     document.getElementById('greet').textContent = `${g}，${SITE.name} 💕`;
-    document.getElementById('brandMascot').textContent = '我的';
+    const bm = document.getElementById('brandMascot');
+    bm.innerHTML = '<img src="assets/img/mascots/1.png" alt="小昕">';
   }
 
   // 初始化

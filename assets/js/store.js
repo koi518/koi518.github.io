@@ -65,7 +65,8 @@ const DB = {
 
 /* 站点配置（生日八字等，可改） */
 const SITE = DB.get('site', null) || {
-  name: '小哭宝',
+  name: '小昕',
   bazi: { y: 2004, m: 3, d: 3, h: 12 }, // 默认午时，待校准
 };
+SITE.name = '小昕'; // 强制覆盖旧缓存，保证改名生效
 DB.set('site', SITE);
