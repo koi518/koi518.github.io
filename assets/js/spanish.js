@@ -30,7 +30,13 @@
 
   // 取某天数据（不自动写库，避免污染历史）
   function getDay(dk = DayNav.get(KEY)) {
-    return DB.day(KEY, dk) || {
+    const base = DB.day(KEY, dk);
+    if (base) {
+      // 兼容早期版本用 words 字段灌入的示例数据，自动迁移为 sentences
+      if (base.words && !base.sentences) { base.sentences = base.words; delete base.words; }
+      return base;
+    }
+    return {
       sentences: dailySentences(dk),
       listen: { min: 0, done: false },
       write: { text: '', done: false },

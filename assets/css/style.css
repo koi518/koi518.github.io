@@ -267,3 +267,33 @@ input, textarea, select { font-family: inherit; font-size: 15px; }
   backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
 }
 :root[data-theme="dark"] .btn:hover { box-shadow: 0 6px 18px rgba(233, 30, 99, .4); }
+
+/* ===== 设置弹窗 ===== */
+.modal {
+  position: fixed; inset: 0; z-index: 60; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+  background: rgba(40, 12, 28, .5);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.modal.show { display: flex; }
+.modal-card {
+  width: 100%; max-width: 440px; max-height: 86vh; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px; border-bottom: 1px solid var(--border); font-weight: 800;
+}
+.modal-head h2 { font-size: 18px; }
+.modal-body { padding: 8px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.set-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px; border-radius: 16px; background: var(--surface2);
+}
+.set-title { font-weight: 700; font-size: 14px; }
+.set-sub { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; max-width: 250px; }
+.set-row.danger .set-title { color: var(--bad); }
+.btn.danger { background: var(--bad); }
+.btn.danger:hover { box-shadow: 0 6px 18px rgba(229, 57, 90, .4); }
+:root[data-theme="dark"] .modal-card { -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }

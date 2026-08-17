@@ -92,6 +92,59 @@
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('scrim').classList.remove('show');
     };
+
+    // 设置弹窗：打开 / 关闭
+    const modal = document.getElementById('settingsModal');
+    const openSettings = () => modal.classList.add('show');
+    const closeSettings = () => modal.classList.remove('show');
+    document.getElementById('settingsBtnTop').onclick = openSettings;
+    document.getElementById('settingsBtnSide').onclick = openSettings;
+    document.getElementById('settingsClose').onclick = closeSettings;
+    modal.onclick = (e) => { if (e.target === modal) closeSettings(); };
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSettings(); });
+
+    // 导出全部数据（打包所有 localStorage 为 JSON 下载）
+    document.getElementById('exportBtn').onclick = () => {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        data[k] = localStorage.getItem(k);
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+      a.href = url;
+      a.download = `小昕工作台-数据备份-${stamp}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    };
+
+    // 导入数据（覆盖同名）
+    document.getElementById('importFile').onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (confirm('导入会用文件内容覆盖当前同名数据，确定继续？')) {
+            Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+            location.reload();
+          }
+        } catch (err) { alert('文件解析失败：' + err.message); }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    };
+
+    // 清除全部数据
+    document.getElementById('clearBtn').onclick = () => {
+      if (confirm('确定清除本地全部数据吗？此操作不可恢复！')) {
+        localStorage.clear();
+        location.reload();
+      }
+    };
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

@@ -82,7 +82,7 @@
       const spanish = DB.get('spanish', {});
       if (!spanish[dk(now.getDate())]) {
         spanish[dk(now.getDate())] = {
-          words: [
+          sentences: [
             { t: 'el trabajo', m: '工作', done: true },
             { t: 'aprender', m: '学习', done: true },
             { t: 'la comida', m: '食物', done: false },

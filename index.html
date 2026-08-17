@@ -14,6 +14,7 @@
     <button id="menuBtn" class="icon-btn" aria-label="菜单">☰</button>
     <div class="topbar-title">小昕工作台</div>
     <button id="themeBtn" class="icon-btn" aria-label="切换主题">🌗</button>
+    <button id="settingsBtnTop" class="icon-btn" aria-label="设置">⚙️</button>
   </header>
 
   <div class="layout">
@@ -30,6 +31,7 @@
       <nav class="nav" id="nav"><!-- JS 注入 8 个模块入口 --></nav>
 
       <div class="sidebar-foot">
+        <button id="settingsBtnSide" class="ghost-btn">⚙️ 设置 / 数据备份</button>
         <button id="themeBtn2" class="ghost-btn">🌗 主题：<span id="themeLabel">自动</span></button>
         <div class="foot-tip">数据仅存本地浏览器 · 记得常备份</div>
       </div>
@@ -64,5 +66,39 @@
   <script src="assets/js/ainews.js"></script>
   <script src="assets/js/health.js"></script>
   <script src="assets/js/app.js"></script>
+
+  <!-- 设置弹窗 -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>⚙️ 设置</h2>
+        <button class="icon-btn" id="settingsClose" aria-label="关闭">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="set-row">
+          <div>
+            <div class="set-title">导出全部数据</div>
+            <div class="set-sub">把全部模块的本地记录打包成 JSON 文件，便于备份或换设备迁移。</div>
+          </div>
+          <button class="btn" id="exportBtn">导出</button>
+        </div>
+        <div class="set-row">
+          <div>
+            <div class="set-title">导入数据</div>
+            <div class="set-sub">从导出的 JSON 文件恢复（同名数据将被覆盖）。</div>
+          </div>
+          <label class="btn sec" style="cursor:pointer">选择文件<input type="file" id="importFile" accept="application/json" hidden></label>
+        </div>
+        <div class="set-row danger">
+          <div>
+            <div class="set-title">清除全部数据</div>
+            <div class="set-sub">清空本地所有记录（含设置），操作不可恢复。</div>
+          </div>
+          <button class="btn danger" id="clearBtn">清除</button>
+        </div>
+        <div class="set-sub" style="text-align:center;padding-top:4px">当前数据仅保存在本机浏览器，导出是对抗误删 / 换设备最稳妥的方式 💾</div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
