@@ -102,6 +102,16 @@
   }
 
   function render(view) {
+    if (!SITE.bazi || !SITE.bazi.y) {
+      view.innerHTML = `
+        <div class="card">
+          <h2>🔮 每日运势</h2>
+          <p style="color:var(--text-soft);line-height:1.9;margin:8px 0">还没有设置出生信息，运势暂时算不了～</p>
+          <p class="muted">打开左上角 ⚙️ 设置 →「个人资料」，填一下出生年 / 月 / 日 / 小时，运势就会按你的命盘推算啦（纯属娱乐）。</p>
+          <button class="btn" onclick="document.getElementById('settingsBtnSide').click()">去设置</button>
+        </div>`;
+      return;
+    }
     const f = compute();
     const starHtml = Array.from({ length: 5 }, (_, i) =>
       `<span class="${i < f.stars ? '' : 'off'}">★</span>`).join('');
@@ -143,7 +153,7 @@
           <ul style="margin:0;padding-left:18px;color:var(--text-soft);line-height:1.9;font-size:14px">${noteHtml}</ul>
         </div>
 
-        <p class="muted" style="margin-top:14px;font-size:12px">命盘参考：${f.me.yg} ${f.me.mg} ${f.me.dg} ${f.me.hg}（出生时辰默认午时，在 store.js 改成真实时辰会更准）。</p>
+        <p class="muted" style="margin-top:14px;font-size:12px">命盘参考：${f.me.yg} ${f.me.mg} ${f.me.dg} ${f.me.hg}（出生时辰在设置 → 个人资料里改成真实时间会更准）。</p>
       </div>`;
   }
 

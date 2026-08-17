@@ -59,6 +59,9 @@
     DB.set('theme', next); applyTheme(next);
   }
 
+  // 应用名（随用户称呼变化，用于标题 / 导出文件名）
+  function appName() { return ((SITE.name || '').trim() || '我的') + '工作台'; }
+
   // 日期栏
   function refreshHeader() {
     const now = new Date();
@@ -70,9 +73,13 @@
       `农历 ${lu.getMonthInChinese()}月${lu.getDayInChinese()}` + (jq ? ` · ${jq}` : '');
     const h = now.getHours();
     const g = h < 6 ? '凌晨好' : h < 12 ? '早上好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好';
-    document.getElementById('greet').textContent = `${g}，${SITE.name} 💕`;
+    const nm = (SITE.name || '').trim();
+    document.getElementById('greet').textContent = nm ? `${g}，${nm} 💕` : `${g} 💕`;
+    const bnEl = document.getElementById('brandName'); if (bnEl) bnEl.textContent = appName();
+    const ttEl = document.getElementById('topTitle'); if (ttEl) ttEl.textContent = appName();
+    document.title = appName();
     const bm = document.getElementById('brandMascot');
-    bm.innerHTML = '<img src="assets/img/mascots/1.png" alt="小昕">';
+    bm.innerHTML = '<img src="assets/img/mascots/1.png" alt="">';
   }
 
   // 初始化
@@ -115,7 +122,7 @@
       const a = document.createElement('a');
       const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
       a.href = url;
-      a.download = `小昕工作台-数据备份-${stamp}.json`;
+      a.download = `${appName()}-数据备份-${stamp}.json`;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
     };
@@ -231,13 +238,13 @@
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sheets[name]), name.slice(0, 31));
       });
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
-        ['小昕工作台 · 数据导出 (Excel)'],
+        [appName() + ' · 数据导出 (Excel)'],
         ['导出时间', new Date().toLocaleString('zh-CN')],
         ['说明', '本表为各模块历史记录快照，按模块分工作表。'],
         ['提示', '需完整备份/恢复请用同窗口的“导出全部数据(JSON)”。']
       ]), '导出说明');
 
-      XLSX.writeFile(wb, `小昕工作台-数据-${stamp}.xlsx`);
+      XLSX.writeFile(wb, `${appName()}-数据-${stamp}.xlsx`);
     };
 
     // 导出 CSV（单文件统一活动流，UTF-8 BOM 防乱码）
@@ -261,7 +268,7 @@
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `小昕工作台-数据-${stamp}.csv`;
+      a.href = url; a.download = `${appName()}-数据-${stamp}.csv`;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
     };
@@ -285,7 +292,7 @@
     };
 
     // ===== 云同步（GitHub）=====
-    const SYNC_DEF = { repo: 'koi518/koi518.github.io', branch: 'sync', path: 'data.json', token: '' };
+    const SYNC_DEF = { repo: '', branch: 'sync', path: 'data.json', token: '' };
     function syncCfg() { return Object.assign({}, SYNC_DEF, DB.get('syncCfg', {})); }
     function b64enc(str) { return btoa(unescape(encodeURIComponent(str))); }
     function b64dec(b64) { return decodeURIComponent(escape(atob(b64.replace(/\s/g, '')))); }
@@ -379,6 +386,23 @@
     };
     document.getElementById('syncPush').onclick = syncPush;
     document.getElementById('syncPull').onclick = syncPull;
+
+    // 个人资料：称呼 + 出生信息（非技术用户可在设置面板自行修改，无需碰代码）
+    const pn = document.getElementById('profName'), py = document.getElementById('profY'),
+          pm = document.getElementById('profM'), pd = document.getElementById('profD'), ph = document.getElementById('profH');
+    for (let i = 0; i < 24; i++) { const o = document.createElement('option'); o.value = i; o.textContent = i + ' 点'; ph.appendChild(o); }
+    pn.value = (SITE.name || '').trim();
+    if (SITE.bazi) { py.value = SITE.bazi.y || ''; pm.value = SITE.bazi.m || ''; pd.value = SITE.bazi.d || ''; ph.value = (SITE.bazi.h != null) ? SITE.bazi.h : ''; }
+    document.getElementById('profSave').onclick = () => {
+      SITE.name = (pn.value || '').trim();
+      const y = parseInt(py.value, 10), m = parseInt(pm.value, 10), d = parseInt(pd.value, 10);
+      const hv = ph.value === '' ? null : parseInt(ph.value, 10);
+      SITE.bazi = (y && m && d) ? { y, m, d, h: hv == null ? 12 : hv } : null;
+      DB.set('site', SITE);
+      refreshHeader();
+      const ps = document.getElementById('profStatus');
+      if (ps) { ps.textContent = '✅ 已保存'; ps.style.color = 'var(--primary-d)'; }
+    };
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

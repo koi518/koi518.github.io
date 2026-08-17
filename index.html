@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#e91e63" />
-  <title>小昕 · 个人工作台</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=20260817g" />
+  <title>个人工作台</title>
+  <link rel="stylesheet" href="assets/css/style.css?v=20260818a" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍼</text></svg>" />
 </head>
 <body>
   <!-- 手机端顶部栏 -->
   <header class="topbar">
     <button id="menuBtn" class="icon-btn" aria-label="菜单">☰</button>
-    <div class="topbar-title">小昕工作台</div>
+    <div class="topbar-title" id="topTitle">个人工作台</div>
     <button id="themeBtn" class="icon-btn" aria-label="切换主题">🌗</button>
     <button id="settingsBtnTop" class="icon-btn" aria-label="设置">⚙️</button>
   </header>
@@ -23,7 +23,7 @@
       <div class="brand">
         <div class="brand-logo" id="brandMascot"></div>
         <div class="brand-text">
-          <div class="brand-name">小昕工作台</div>
+          <div class="brand-name" id="brandName">个人工作台</div>
           <div class="brand-sub" id="brandDate">—</div>
         </div>
       </div>
@@ -53,20 +53,20 @@
     </main>
   </div>
 
-  <script src="assets/vendor/lunar.js?v=20260817g"></script>
-  <script src="assets/vendor/xlsx.full.min.js?v=20260817g"></script>
-  <script src="assets/js/store.js?v=20260817g"></script>
-  <script src="assets/js/daynav.js?v=20260817g"></script>
-  <script src="assets/js/seed.js?v=20260817g"></script>
-  <script src="assets/js/fortune.js?v=20260817g"></script>
-  <script src="assets/js/todo.js?v=20260817g"></script>
-  <script src="assets/js/finance.js?v=20260817g"></script>
-  <script src="assets/js/spanish.js?v=20260817g"></script>
-  <script src="assets/js/english.js?v=20260817g"></script>
-  <script src="assets/js/financenews.js?v=20260817g"></script>
-  <script src="assets/js/ainews.js?v=20260817g"></script>
-  <script src="assets/js/health.js?v=20260817g"></script>
-  <script src="assets/js/app.js?v=20260817g"></script>
+  <script src="assets/vendor/lunar.js?v=20260818a"></script>
+  <script src="assets/vendor/xlsx.full.min.js?v=20260818a"></script>
+  <script src="assets/js/store.js?v=20260818a"></script>
+  <script src="assets/js/daynav.js?v=20260818a"></script>
+  <script src="assets/js/seed.js?v=20260818a"></script>
+  <script src="assets/js/fortune.js?v=20260818a"></script>
+  <script src="assets/js/todo.js?v=20260818a"></script>
+  <script src="assets/js/finance.js?v=20260818a"></script>
+  <script src="assets/js/spanish.js?v=20260818a"></script>
+  <script src="assets/js/english.js?v=20260818a"></script>
+  <script src="assets/js/financenews.js?v=20260818a"></script>
+  <script src="assets/js/ainews.js?v=20260818a"></script>
+  <script src="assets/js/health.js?v=20260818a"></script>
+  <script src="assets/js/app.js?v=20260818a"></script>
 
   <!-- 设置弹窗 -->
   <div class="modal" id="settingsModal">
@@ -76,6 +76,25 @@
         <button class="icon-btn" id="settingsClose" aria-label="关闭">✕</button>
       </div>
       <div class="modal-body">
+        <div class="set-row">
+          <div style="width:100%">
+            <div class="set-title">👤 个人资料</div>
+            <div class="set-sub">设置你的称呼和出生信息，用于问候语和每日运势推算。这些信息只存在本机浏览器。</div>
+            <div class="sync-form">
+              <input class="input" id="profName" placeholder="你的称呼，如 小名 / 昵称（留空则只显示问候）" />
+              <div class="sync-row">
+                <input class="input" id="profY" placeholder="出生年" inputmode="numeric" style="flex:1;min-width:0" />
+                <input class="input" id="profM" placeholder="月" inputmode="numeric" style="max-width:60px" />
+                <input class="input" id="profD" placeholder="日" inputmode="numeric" style="max-width:60px" />
+                <select class="input" id="profH" style="max-width:120px"><option value="">出生小时</option></select>
+              </div>
+              <div class="sync-actions">
+                <button class="btn" id="profSave">保存资料</button>
+                <span class="set-sub" id="profStatus"></span>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="set-row">
           <div>
             <div class="set-title">导出全部数据</div>
