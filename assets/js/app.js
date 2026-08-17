@@ -1,15 +1,15 @@
 /* ===== 主程序：导航 / 主题 / 路由 ===== */
 (function () {
-  // 8 个模块头像（文字“我的”圆形徽标）
+  // 8 个模块头像（Hello Kitty 图，mascots/2~9.png；品牌头像用 1.png）
   const MODULES = [
-    { key: 'fortune', name: '每日运势', emoji: '我的', render: () => window.Fortune.render(view) },
-    { key: 'todo', name: '待办清单', emoji: '我的', render: () => window.Todo.render(view) },
-    { key: 'finance', name: '每日记账', emoji: '我的', render: () => window.Finance.render(view) },
-    { key: 'spanish', name: '西语学习', emoji: '我的', render: () => window.Spanish.render(view) },
-    { key: 'english', name: '英语学习', emoji: '我的', render: () => window.English.render(view) },
-    { key: 'financenews', name: '金融信息', emoji: '我的', render: () => window.FinanceNews.render(view) },
-    { key: 'ainews', name: 'AI 播报', emoji: '我的', render: () => window.AINews.render(view) },
-    { key: 'health', name: '运动饮食', emoji: '我的', render: () => window.Health.render(view) },
+    { key: 'fortune', name: '每日运势', img: 'assets/img/mascots/2.png', render: () => window.Fortune.render(view) },
+    { key: 'todo', name: '待办清单', img: 'assets/img/mascots/3.png', render: () => window.Todo.render(view) },
+    { key: 'finance', name: '每日记账', img: 'assets/img/mascots/4.png', render: () => window.Finance.render(view) },
+    { key: 'spanish', name: '西语学习', img: 'assets/img/mascots/5.png', render: () => window.Spanish.render(view) },
+    { key: 'english', name: '英语学习', img: 'assets/img/mascots/6.png', render: () => window.English.render(view) },
+    { key: 'financenews', name: '金融信息', img: 'assets/img/mascots/7.png', render: () => window.FinanceNews.render(view) },
+    { key: 'ainews', name: 'AI 播报', img: 'assets/img/mascots/8.png', render: () => window.AINews.render(view) },
+    { key: 'health', name: '运动饮食', img: 'assets/img/mascots/9.png', render: () => window.Health.render(view) },
   ];
 
   const view = document.getElementById('view');
