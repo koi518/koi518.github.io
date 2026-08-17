@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#e91e63" />
   <title>小昕 · 个人工作台</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=20260817e" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260817f" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍼</text></svg>" />
 </head>
 <body>
@@ -53,20 +53,20 @@
     </main>
   </div>
 
-  <script src="assets/vendor/lunar.js?v=20260817e"></script>
-  <script src="assets/vendor/xlsx.full.min.js?v=20260817e"></script>
-  <script src="assets/js/store.js?v=20260817e"></script>
-  <script src="assets/js/daynav.js?v=20260817e"></script>
-  <script src="assets/js/seed.js?v=20260817e"></script>
-  <script src="assets/js/fortune.js?v=20260817e"></script>
-  <script src="assets/js/todo.js?v=20260817e"></script>
-  <script src="assets/js/finance.js?v=20260817e"></script>
-  <script src="assets/js/spanish.js?v=20260817e"></script>
-  <script src="assets/js/english.js?v=20260817e"></script>
-  <script src="assets/js/financenews.js?v=20260817e"></script>
-  <script src="assets/js/ainews.js?v=20260817e"></script>
-  <script src="assets/js/health.js?v=20260817e"></script>
-  <script src="assets/js/app.js?v=20260817e"></script>
+  <script src="assets/vendor/lunar.js?v=20260817f"></script>
+  <script src="assets/vendor/xlsx.full.min.js?v=20260817f"></script>
+  <script src="assets/js/store.js?v=20260817f"></script>
+  <script src="assets/js/daynav.js?v=20260817f"></script>
+  <script src="assets/js/seed.js?v=20260817f"></script>
+  <script src="assets/js/fortune.js?v=20260817f"></script>
+  <script src="assets/js/todo.js?v=20260817f"></script>
+  <script src="assets/js/finance.js?v=20260817f"></script>
+  <script src="assets/js/spanish.js?v=20260817f"></script>
+  <script src="assets/js/english.js?v=20260817f"></script>
+  <script src="assets/js/financenews.js?v=20260817f"></script>
+  <script src="assets/js/ainews.js?v=20260817f"></script>
+  <script src="assets/js/health.js?v=20260817f"></script>
+  <script src="assets/js/app.js?v=20260817f"></script>
 
   <!-- 设置弹窗 -->
   <div class="modal" id="settingsModal">
@@ -103,6 +103,26 @@
             <div class="set-sub">从导出的 JSON 文件恢复（同名数据将被覆盖）。</div>
           </div>
           <label class="btn sec" style="cursor:pointer">选择文件<input type="file" id="importFile" accept="application/json" hidden></label>
+        </div>
+        <div class="set-row sync-row-block">
+          <div style="width:100%">
+            <div class="set-title">☁️ 云同步（GitHub）</div>
+            <div class="set-sub">把本地数据备份到你的 GitHub 仓库，换手机 / 电脑一键拉回。需在 GitHub 生成一个有 <b>repo</b> 权限的令牌(PAT)粘贴在下方。</div>
+            <div class="sync-form">
+              <input class="input" id="syncToken" type="password" placeholder="GitHub 令牌 PAT（repo 权限）" autocomplete="off" />
+              <div class="sync-row">
+                <input class="input" id="syncRepo" placeholder="owner/repo" style="flex:1;min-width:0" />
+                <input class="input" id="syncBranch" placeholder="分支" value="sync" style="max-width:92px" />
+              </div>
+              <input class="input" id="syncPath" placeholder="文件路径" value="data.json" />
+              <div class="sync-actions">
+                <button class="btn sec" id="syncSaveCfg">保存配置</button>
+                <button class="btn" id="syncPush">☁️ 上传</button>
+                <button class="btn sec" id="syncPull">☁️ 下载</button>
+              </div>
+              <div class="set-sub" id="syncStatus"></div>
+            </div>
+          </div>
         </div>
         <div class="set-row danger">
           <div>

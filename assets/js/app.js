@@ -284,6 +284,68 @@
       e.target.value = '';
     };
 
+    // ===== 云同步（GitHub）=====
+    const SYNC_DEF = { repo: 'koi518/koi518.github.io', branch: 'sync', path: 'data.json', token: '' };
+    function syncCfg() { return Object.assign({}, SYNC_DEF, DB.get('syncCfg', {})); }
+    function b64enc(str) { return btoa(unescape(encodeURIComponent(str))); }
+    function b64dec(b64) { return decodeURIComponent(escape(atob(b64.replace(/\s/g, '')))); }
+    function setSyncStatus(msg, isErr) {
+      const el = document.getElementById('syncStatus');
+      if (el) { el.textContent = msg; el.style.color = isErr ? '#ef6b7d' : 'var(--primary-d)'; }
+    }
+    async function gh(pathUrl, opts) {
+      const cfg = syncCfg();
+      const headers = Object.assign({ 'Content-Type': 'application/json' }, (opts && opts.headers) || {});
+      if (cfg.token) headers['Authorization'] = 'Bearer ' + cfg.token;
+      return fetch('https://api.github.com' + pathUrl, Object.assign({ headers }, opts));
+    }
+    async function ensureBranch(cfg) {
+      const r = await gh(`/repos/${cfg.repo}/git/ref/heads/${cfg.branch}`);
+      if (r.ok) return;
+      if (r.status !== 404) throw new Error('检查分支失败: ' + r.status);
+      const info = await gh(`/repos/${cfg.repo}`);
+      const def = (await info.json()).default_branch || 'main';
+      const ref = await gh(`/repos/${cfg.repo}/git/ref/heads/${def}`);
+      if (!ref.ok) throw new Error('取默认分支失败');
+      const sha = (await ref.json()).object.sha;
+      const c = await gh(`/repos/${cfg.repo}/git/refs`, { method: 'POST', body: JSON.stringify({ ref: `refs/heads/${cfg.branch}`, sha }) });
+      if (!c.ok) throw new Error('创建分支失败: ' + c.status);
+    }
+    async function syncPush() {
+      const cfg = syncCfg();
+      if (!cfg.token) { setSyncStatus('请先填写并保存 GitHub 令牌', true); return; }
+      setSyncStatus('上传中…');
+      try {
+        await ensureBranch(cfg);
+        const data = {};
+        for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); data[k] = localStorage.getItem(k); }
+        const content = b64enc(JSON.stringify(data));
+        let sha = '';
+        const get = await gh(`/repos/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}`);
+        if (get.ok) sha = (await get.json()).sha || '';
+        const put = await gh(`/repos/${cfg.repo}/contents/${cfg.path}`, {
+          method: 'PUT', body: JSON.stringify({ message: 'sync: ' + new Date().toISOString(), content, branch: cfg.branch, sha })
+        });
+        if (!put.ok) { const e = await put.json().catch(() => ({})); throw new Error('上传失败 ' + put.status + ' ' + (e.message || '')); }
+        setSyncStatus('✅ 已上传到云端');
+      } catch (err) { setSyncStatus('❌ ' + err.message, true); }
+    }
+    async function syncPull() {
+      const cfg = syncCfg();
+      if (!cfg.token) { setSyncStatus('请先填写并保存 GitHub 令牌', true); return; }
+      setSyncStatus('下载中…');
+      try {
+        const get = await gh(`/repos/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}`);
+        if (get.status === 404) { setSyncStatus('云端还没有数据，请先上传一份', true); return; }
+        if (!get.ok) throw new Error('下载失败 ' + get.status);
+        const j = await get.json();
+        const data = JSON.parse(b64dec(j.content));
+        if (!confirm('下载会用云端数据覆盖本地同名数据，确定继续？')) { setSyncStatus('已取消'); return; }
+        Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+        location.reload();
+      } catch (err) { setSyncStatus('❌ ' + err.message, true); }
+    }
+
     // 清除全部数据
     document.getElementById('clearBtn').onclick = () => {
       if (confirm('确定清除本地全部数据吗？此操作不可恢复！')) {
@@ -291,6 +353,26 @@
         location.reload();
       }
     };
+
+    // 云同步（GitHub）：回填配置 + 绑定
+    const cfg0 = syncCfg();
+    const stEl = document.getElementById('syncToken'), srEl = document.getElementById('syncRepo'),
+          sbEl = document.getElementById('syncBranch'), spEl = document.getElementById('syncPath');
+    if (stEl) stEl.value = cfg0.token || '';
+    if (srEl) srEl.value = cfg0.repo || '';
+    if (sbEl) sbEl.value = cfg0.branch || '';
+    if (spEl) spEl.value = cfg0.path || '';
+    document.getElementById('syncSaveCfg').onclick = () => {
+      DB.set('syncCfg', {
+        repo: (srEl.value || '').trim(),
+        branch: (sbEl.value || '').trim() || 'sync',
+        path: (spEl.value || '').trim() || 'data.json',
+        token: (stEl.value || '').trim()
+      });
+      setSyncStatus('✅ 配置已保存（令牌仅存在本机浏览器）');
+    };
+    document.getElementById('syncPush').onclick = syncPush;
+    document.getElementById('syncPull').onclick = syncPull;
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
